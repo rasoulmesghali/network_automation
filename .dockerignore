@@ -1,0 +1,7 @@
+*.md
+.venv/
+.vscode/
+__pycache__/
+Dockerfile
+*.Dockerfile
+!README.md
