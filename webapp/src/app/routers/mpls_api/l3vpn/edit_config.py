@@ -40,6 +40,8 @@ class VRFdata(BaseModel):
     vrf_rd: str
     vrf_export_rt: str
     vrf_import_rt: str
+    
+
 class BGPData(BaseModel):
     bgp_local_asn: int
     bgp_router_id: str

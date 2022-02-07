@@ -37,12 +37,6 @@ class connectionData(BaseModel):
     username: str
     password: str
     device_type: str
-    
-class VRFdata(BaseModel):
-    vrf_name: Optional[str]
-    vrf_rd: Optional[str]
-    vrf_export_rt: Optional[str]
-    vrf_import_rt: Optional[str]
 
 class BGPNeighbor_data(BaseModel):
     unicast: Optional[bool] = False
@@ -57,21 +51,14 @@ class BGPData(BaseModel):
     bgp_router_id: str
     neighbor_data: Optional[List[BGPNeighbor_data]] = None
     
-class loopBackData(BaseModel):
-    loopback_number: int
-    ipv4: Optional[str]
-    ipv4_mask: Optional[str]
-    vrf_name: Optional[str] = None
-    
 class config_data(BaseModel):
     connection_data: connectionData
-    vrf_data: Optional[VRFdata]
     mpbgp_data: Optional[BGPData]
-    loopback_data: Optional[loopBackData]
 
 
-@router.post("/mpls/l3vpn/delete-config/", tags=["mpls l3vpn delete config"])
-async def edit_config(request:config_data):
+
+@router.post("/mpls/l3vpn/mpbgp-config/", tags=["mpbgp config"])
+async def mpbgp_config(request:config_data):
     
     """
     Receives request data in json format and configures mpls l3vpn
@@ -80,8 +67,6 @@ async def edit_config(request:config_data):
     req = request.dict()
     print(req)
     connection_data = req.get('connection_data')
-    vrf_data = req.get('vrf_data')
-    loopback_data = req.get('loopback_data')
     mpbgp_data = req.get('mpbgp_data')
     
     # print(loopback_data)
@@ -110,39 +95,21 @@ async def edit_config(request:config_data):
     mpbgp_payload = template.render(data=mpbgp_data)
 
     print(mpbgp_payload)   
-    # # result = ncc_connection.get_config('running').data_xml
-    # vrf_template = open("dependencies/xml_templates/vrf.xml").read()
-    # vrf_payload = vrf_template.format(**vrf_data)
-        
-    # loopback_template = open("dependencies/xml_templates/loopback_interface.xml").read()
-    # loopback_payload = loopback_template.format(**loopback_data, **vrf_data)
-        
-    # mpbgp_template = open("dependencies/xml_templates/mp_bgp.xml").read()
-    # mpbgp_payload = mpbgp_template.format(**mpbgp_data, **vrf_data)
-
-    # print(loopback_payload)
 
     # Send NETCONF <edit-config>
     # try:
-    # with ncc_connection.locked(target='candidate'):
-        
-    # #     # ncc_connection.edit_config(vrf_payload, target="candidate")
-    # #     # ncc_connection.commit()
+    with ncc_connection.locked(target='candidate'):
 
-    #     ncc_connection.edit_config(loopback_payload, target="candidate")
-    #     ncc_connection.commit()
-
-    #     # ncc_connection.edit_config(mpbgp_payload, target="candidate")
-        
-        # ncc_connection.commit()
-        # ncc.save_config(ncc_connection)
+        ncc_connection.edit_config(mpbgp_payload, target="candidate")
+        ncc_connection.commit()
+        ncc.save_config(ncc_connection)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
             "message":"",
-            "data": "loopback_payload"
+            "data": mpbgp_payload
         }),
     )
 

@@ -2,28 +2,33 @@
     <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
     <router>
             <bgp xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-bgp">
-                <id>{bgp_local_asn}</id>
+                <id>{{data.bgp_local_asn}}</id>
                 <bgp>
                     <log-neighbor-changes>true</log-neighbor-changes>
                     <router-id>
-                    <ip-id>{bgp_router_id}</ip-id>
+                    <ip-id>{{data.bgp_router_id}}</ip-id>
                   </router-id>
                 </bgp>
+                {% if data.neighbor_data %}
+                {% for neighbor in data.neighbor_data %}
+                {% if neighbor.unicast %}
                 <neighbor>
-                    <id>{bgp_neighbor_addr}</id>
-                    <remote-as>{bgp_remote_asn}</remote-as>
+                    <id>{{neighbor.bgp_neighbor_addr}}</id>
+                    <remote-as>{{neighbor.bgp_remote_asn}}</remote-as>
                     <update-source>
                         <interface>
-                            <Loopback>{bgp_source_loopback}</Loopback>
+                            <Loopback>{{neighbor.bgp_source_loopback}}</Loopback>
                         </interface>
                     </update-source>
                 </neighbor>
+                {% endif %}
+                {% if neighbor.vpnv4 %}
                 <address-family>
                     <with-vrf>
                         <ipv4>
                             <af-name>unicast</af-name>
                             <vrf>
-                                <name>{vrf_name}</name>
+                                <name>{{neighbor.vrf_name}}</name>
                                 <ipv4-unicast>
                                     <redistribute-vrf>
                                         <connected/>
@@ -37,7 +42,7 @@
                             <af-name>unicast</af-name>
                             <vpnv4-unicast>
                                 <neighbor>
-                                    <id>{bgp_neighbor_addr}</id>
+                                    <id>{{neighbor.bgp_neighbor_addr}}</id>
                                     <activate/>
                                     <send-community>
                                         <send-community-where>extended</send-community-where>
@@ -47,6 +52,9 @@
                         </vpnv4>
                     </no-vrf>
                 </address-family>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
             </bgp>
         </router>
     </native>

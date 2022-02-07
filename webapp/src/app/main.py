@@ -18,6 +18,11 @@ from fastapi.encoders import jsonable_encoder
 from routers.mpls_api.l3vpn import edit_config as l3vpn_edit_config
 from routers.mpls_api.l3vpn import get_config as l3vpn_get_config
 from routers.mpls_api.l3vpn import delete_config as l3vpn_delete_config
+
+from routers.mpls_api.l3vpn import config_loopback 
+from routers.mpls_api.l3vpn import config_mpbgp
+from routers.mpls_api.l3vpn import config_vrf
+
 from routers.mpls_api.underlay import edit_config as underlay_edit_config
 from routers.mpls_api.underlay import get_config as underlay_get_config
 from config.security import get_api_key
@@ -32,6 +37,10 @@ app.include_router(l3vpn_delete_config.router)
 app.include_router(l3vpn_edit_config.router)
 app.include_router(underlay_get_config.router)
 app.include_router(underlay_edit_config.router)
+
+app.include_router(config_loopback.router)
+app.include_router(config_mpbgp.router)
+app.include_router(config_vrf.router)
 @app.on_event("startup")
 async def startup_db_client() -> None:
 

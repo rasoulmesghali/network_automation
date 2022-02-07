@@ -1,20 +1,24 @@
 <config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
     <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
-        <interface>
+        <interface {% if data.delete %} operation='delete' {% endif %}>
             <Loopback>
-                <name>{loopback_number}</name>
+                <name>{{data.loopback_number}}</name>
                 <ip>
+                    {% if data.vrf_name %}
                     <vrf>
                         <forwarding>
-                            <word>{vrf_name}</word>
+                            <word>{{data.vrf_name}}</word>
                         </forwarding>
                     </vrf>
+                    {% endif %}
+                    {% if data.ipv4 %}
                     <address>
                         <primary>
-                            <address>{ipv4}</address>
-                            <mask>{ipv4_mask}</mask>
+                            <address>{{data.ipv4}}</address>
+                            <mask>{{data.ipv4_mask}}</mask>
                         </primary>
                     </address>
+                    {% endif %}
                 </ip>
             </Loopback>
         </interface>

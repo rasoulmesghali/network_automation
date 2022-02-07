@@ -2,16 +2,20 @@
     <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
         <ip>
             <vrf>
-                <name>{vrf_name}</name>
-                <rd>{vrf_rd}</rd>
+                <name>{{data.vrf_name}}</name>
+                <rd>{{data.vrf_rd}}</rd>
+                {% if data.vrf_export_rt %}
                 <route-target>
                     <direction>export</direction>
-                    <target>{vrf_export_rt}</target>
+                    <target>{{data.vrf_export_rt}}</target>
                 </route-target>
+                {% endif %}
+                {% if data.vrf_import_rt %}
                 <route-target>
                     <direction>import</direction>
-                    <target>{vrf_import_rt}</target>
+                    <target>{{data.vrf_import_rt}}</target>
                 </route-target>
+                {% endif %}
             </vrf>
         </ip>
     </native>
