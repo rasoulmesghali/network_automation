@@ -1,0 +1,18 @@
+<config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+        <ip>
+            <vrf>
+                <name>{vrf_name}</name>
+                <rd>{vrf_rd}</rd>
+                <route-target>
+                    <direction>export</direction>
+                    <target>{vrf_export_rt}</target>
+                </route-target>
+                <route-target>
+                    <direction>import</direction>
+                    <target>{vrf_import_rt}</target>
+                </route-target>
+            </vrf>
+        </ip>
+    </native>
+</config>

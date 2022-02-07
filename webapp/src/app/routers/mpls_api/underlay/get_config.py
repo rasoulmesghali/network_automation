@@ -37,7 +37,7 @@ class connectionData(BaseModel):
 async def get_config(request: connectionData):
     
     """
-    Receives request data in json format and verifys mpls underlay status and configurations.
+    Receives request data in json format and verifys mpls underlay status and configurations
 
     """
     req = request.dict()
