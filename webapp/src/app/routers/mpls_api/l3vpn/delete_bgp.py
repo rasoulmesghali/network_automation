@@ -81,12 +81,22 @@ async def mpbgp_delete(request:config_data):
     print(mpbgp_payload)   
 
     # Send NETCONF <edit-config>
-    # try:
-    with ncc_connection.locked(target='candidate'):
+    try:
+        with ncc_connection.locked(target='candidate'):
 
-        ncc_connection.edit_config(mpbgp_payload, target="candidate")
-        ncc_connection.commit()
-        ncc.save_config(ncc_connection)
+            ncc_connection.edit_config(mpbgp_payload, target="candidate")
+            ncc_connection.commit()
+            ncc.save_config(ncc_connection)
+            
+    except Exception as e:
+        return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder({
+            "status": "failure",
+            "message":"The operation failed",
+            "data": [f"1-Check the BGP ASN","2-Check if the BGP configuration is existed" ]
+        }),
+        )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
