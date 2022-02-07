@@ -37,20 +37,14 @@ class connectionData(BaseModel):
     username: str
     password: str
     device_type: str
-        
-class loopBackData(BaseModel):
-    loopback_number: int
-    ipv4: Optional[str]
-    ipv4_mask: Optional[str]
-    vrf_name: Optional[str] = None
     
 class config_data(BaseModel):
     connection_data: connectionData
-    loopback_data: Optional[loopBackData]
+    vrf_name: Optional[str]
 
 
-@router.post("/mpls/l3vpn/loopback-config/", tags=["loopback config"])
-async def loopback_config(request:config_data):
+@router.delete("/mpls/l3vpn/vrf-delete/", tags=["vrf delete"])
+async def vrf_delete(request:config_data):
     
     """
     Receives request data in json format and configures mpls l3vpn
@@ -59,9 +53,9 @@ async def loopback_config(request:config_data):
     req = request.dict()
     print(req)
     connection_data = req.get('connection_data')
-    loopback_data = req.get('loopback_data')
-    loopback_number = loopback_data.get('loopback_number')
-    # print(loopback_data)
+    vrf_name = req.get('vrf_name')
+    vrf_data = req
+    vrf_data['delete'] = True
 
     try:
         ncc = NetconfHandler(**connection_data)
@@ -79,29 +73,39 @@ async def loopback_config(request:config_data):
         }),
         )
         
-    template = "loopback_interface.xml"
+    template = "vrf.xml"
 
     file_loader = FileSystemLoader("dependencies/xml_templates/")
     env = Environment(loader=file_loader)
     template = env.get_template(template)
-    loopback_payload = template.render(data=loopback_data)
+    vrf_payload = template.render(data=vrf_data)
 
-    print(loopback_payload)   
-
+    print(vrf_payload)
+    
     # Send NETCONF <edit-config>
-    # try:
-    with ncc_connection.locked(target='candidate'):
-        
-        ncc_connection.edit_config(loopback_payload, target="candidate")
-        ncc_connection.commit()
-        ncc.save_config(ncc_connection)
+    try:
+        with ncc_connection.locked(target='candidate'):
+            
+            ncc_connection.edit_config(vrf_payload, target="candidate")        
+            ncc_connection.commit()
+            ncc.save_config(ncc_connection)
+
+    except Exception as e:
+        return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder({
+            "status": "failure",
+            "message":"The operation failed",
+            "data": [f"1-Make sure there is no interface member of the vrf","2-check bgp configurations" ]
+        }),
+        )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
             "message":"",
-            "data": f"The loopback {loopback_number} successfully configured"
+            "data": f"vrf {vrf_name} successfully removed"
         }),
     )
 

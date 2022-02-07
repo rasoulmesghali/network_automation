@@ -69,8 +69,6 @@ async def mpbgp_config(request:config_data):
     connection_data = req.get('connection_data')
     mpbgp_data = req.get('mpbgp_data')
     
-    # print(loopback_data)
-    # print(req)
     try:
         ncc = NetconfHandler(**connection_data)
         ncc_connection = ncc.connection()
@@ -109,7 +107,7 @@ async def mpbgp_config(request:config_data):
         content=jsonable_encoder({
             "status": "success",
             "message":"",
-            "data": mpbgp_payload
+            "data": "BGP successfully configured"
         }),
     )
 

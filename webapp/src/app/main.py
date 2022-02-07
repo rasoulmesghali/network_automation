@@ -17,7 +17,9 @@ from fastapi.encoders import jsonable_encoder
 # Internal modules
 from routers.mpls_api.l3vpn import edit_config as l3vpn_edit_config
 from routers.mpls_api.l3vpn import get_config as l3vpn_get_config
-from routers.mpls_api.l3vpn import delete_config as l3vpn_delete_config
+from routers.mpls_api.l3vpn import delete_loopback
+from routers.mpls_api.l3vpn import delete_vrf
+from routers.mpls_api.l3vpn import delete_bgp
 
 from routers.mpls_api.l3vpn import config_loopback 
 from routers.mpls_api.l3vpn import config_mpbgp
@@ -33,7 +35,7 @@ app = FastAPI()
 app.state.logger = logger
 # app.include_router(mplsapi.router, dependencies=[Security(get_api_key)])
 app.include_router(l3vpn_get_config.router)
-app.include_router(l3vpn_delete_config.router)
+
 app.include_router(l3vpn_edit_config.router)
 app.include_router(underlay_get_config.router)
 app.include_router(underlay_edit_config.router)
@@ -41,6 +43,10 @@ app.include_router(underlay_edit_config.router)
 app.include_router(config_loopback.router)
 app.include_router(config_mpbgp.router)
 app.include_router(config_vrf.router)
+
+app.include_router(delete_loopback.router)
+app.include_router(delete_vrf.router)
+app.include_router(delete_bgp.router)
 @app.on_event("startup")
 async def startup_db_client() -> None:
 

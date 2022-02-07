@@ -101,7 +101,7 @@ async def vrf_config(request:config_data):
         content=jsonable_encoder({
             "status": "success",
             "message":"",
-            "data": vrf_payload
+            "data": "vrf successfully created"
         }),
     )
 

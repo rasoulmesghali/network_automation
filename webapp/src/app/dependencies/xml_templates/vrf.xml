@@ -1,9 +1,11 @@
 <config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
     <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
-        <ip>
+        <ip {% if data.delete %} operation='delete' {% endif %}>
             <vrf>
                 <name>{{data.vrf_name}}</name>
+                {% if data.vrf_rd %}
                 <rd>{{data.vrf_rd}}</rd>
+                {% endif %}
                 {% if data.vrf_export_rt %}
                 <route-target>
                     <direction>export</direction>

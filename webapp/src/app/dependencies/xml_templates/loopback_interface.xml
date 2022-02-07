@@ -1,7 +1,7 @@
 <config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
     <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
-        <interface {% if data.delete %} operation='delete' {% endif %}>
-            <Loopback>
+        <interface >
+            <Loopback {% if data.delete %} operation='delete' {% endif %}>
                 <name>{{data.loopback_number}}</name>
                 <ip>
                     {% if data.vrf_name %}
