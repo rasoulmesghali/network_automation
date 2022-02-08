@@ -8,7 +8,6 @@ import pydantic
 import motor.motor_asyncio
 
 # Fastapi General
-import fastapi
 from fastapi import Depends, FastAPI, Security, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -24,17 +23,20 @@ from routers.mpls_api.l3vpn import delete_bgp
 from routers.mpls_api.l3vpn import config_loopback 
 from routers.mpls_api.l3vpn import config_mpbgp
 from routers.mpls_api.l3vpn import config_vrf
-
+from routers.general_apis import change_dry_run
 from routers.mpls_api.underlay import edit_config as underlay_edit_config
 from routers.mpls_api.underlay import get_config as underlay_get_config
 from config.security import get_api_key
 from config.log import logger
+from config.fastapi_app import fastapi_app
 
 # Fastapi App
-app = FastAPI()
+app = fastapi_app
 app.state.logger = logger
+
 # app.include_router(mplsapi.router, dependencies=[Security(get_api_key)])
 app.include_router(l3vpn_get_config.router)
+app.include_router(change_dry_run.router)
 
 app.include_router(l3vpn_edit_config.router)
 app.include_router(underlay_get_config.router)
@@ -77,7 +79,6 @@ async def show_environment_variables() -> None:
 @app.on_event("shutdown")
 async def shutdown_db_client() -> None:
     app.mongodb_client.close()
-
 
 #Custom FastAPI's exception handlers
 @app.exception_handler(HTTPException)

@@ -21,6 +21,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from config.fastapi_app import fastapi_app as app
 
 ###########
 # Logging #
@@ -51,28 +52,12 @@ async def loopback_delete(request:config_data):
     """
 
     req = request.dict()
-    print(req)
+  
     connection_data = req.get('connection_data')
     loopback_number = req.get('loopback_number')
     loopback_data = req
     loopback_data['delete'] = True
 
-    try:
-        ncc = NetconfHandler(**connection_data)
-        ncc_connection = ncc.connection()
-        logger.info("\n [+] Netconf Connection successfully established")    
-    except Exception as e:
-        logger.warning(f"\n [+] Connection Failure: \n {e}")
- 
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"Connection Failure",
-            "data": f"{e}"
-        }),
-        )
-        
     template = "loopback_interface.xml"
 
     file_loader = FileSystemLoader("dependencies/xml_templates/")
@@ -80,31 +65,54 @@ async def loopback_delete(request:config_data):
     template = env.get_template(template)
     loopback_payload = template.render(data=loopback_data)
 
-    # Send NETCONF <edit-config>
-    try:
-        with ncc_connection.locked(target='candidate'):
-            
-            ncc_connection.edit_config(loopback_payload, target="candidate")
-            ncc_connection.commit()
-            ncc.save_config(ncc_connection)
-            
-    except Exception as e:
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"The operation failed",
-            "data": f"Loopback {loopback_number} does not exist"
-        }),
-        )
-    
+    if app.state.dry_run:
+        response_message = "dry_run feature is enabled"
+        response_data = loopback_payload
+    else:
 
+        try:
+            ncc = NetconfHandler(**connection_data)
+            ncc_connection = ncc.connection()
+            logger.info("\n [+] Netconf Connection successfully established")    
+        except Exception as e:
+            logger.warning(f"\n [+] Connection Failure: \n {e}")
+    
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"Connection Failure",
+                "data": f"{e}"
+            }),
+            )
+
+        # Send NETCONF <edit-config>
+        try:
+            with ncc_connection.locked(target='candidate'):
+                
+                ncc_connection.edit_config(loopback_payload, target="candidate")
+                ncc_connection.commit()
+                ncc.save_config(ncc_connection)
+                
+        except Exception as e:
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"The operation failed",
+                "data": f"Loopback {loopback_number} does not exist"
+            }),
+            )
+    
+        response_message = "operation is successfully done"
+        response_data = f"loopback {loopback_number} successfully removed"
+        
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
-            "message":"",
-            "data": f"loopback {loopback_number} successfully removed"
+            "message":response_message,
+            "data": response_data
         }),
     )
 

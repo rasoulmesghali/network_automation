@@ -21,6 +21,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from config.fastapi_app import fastapi_app as app
 
 ###########
 # Logging #
@@ -61,24 +62,6 @@ async def vrf_config(request:config_data):
     connection_data = req.get('connection_data')
     vrf_data = req.get('vrf_data')
 
-    # print(vrf_data)
-    
-    try:
-        ncc = NetconfHandler(**connection_data)
-        ncc_connection = ncc.connection()
-        logger.info("\n [+] Netconf Connection successfully established")    
-    except Exception as e:
-        logger.warning(f"\n [+] Connection Failure: \n {e}")
- 
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"Connection Failure",
-            "data": f"{e}"
-        }),
-        )
-        
     template = "vrf.xml"
 
     file_loader = FileSystemLoader("dependencies/xml_templates/")
@@ -86,22 +69,43 @@ async def vrf_config(request:config_data):
     template = env.get_template(template)
     vrf_payload = template.render(data=vrf_data)
 
-    print(vrf_payload)   
- 
-    # Send NETCONF <edit-config>
-    # try:
-    with ncc_connection.locked(target='candidate'):
-        
-        ncc_connection.edit_config(vrf_payload, target="candidate")        
-        ncc_connection.commit()
-        ncc.save_config(ncc_connection)
+    if app.state.dry_run:
+        response_message = "dry_run feature is enabled"
+        response_data = vrf_payload
+    else:
+        try:
+            ncc = NetconfHandler(**connection_data)
+            ncc_connection = ncc.connection()
+            logger.info("\n [+] Netconf Connection successfully established")    
+        except Exception as e:
+            logger.warning(f"\n [+] Connection Failure: \n {e}")
+    
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"Connection Failure",
+                "data": f"{e}"
+            }),
+            )
+    
+        # Send NETCONF <edit-config>
+        # try:
+        with ncc_connection.locked(target='candidate'):
+            
+            ncc_connection.edit_config(vrf_payload, target="candidate")        
+            ncc_connection.commit()
+            ncc.save_config(ncc_connection)
+
+        response_message = "operation is successfully done"
+        response_data = "vrf successfully created"
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
-            "message":"",
-            "data": "vrf successfully created"
+            "message":response_message,
+            "data": response_data
         }),
     )
 

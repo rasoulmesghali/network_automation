@@ -21,6 +21,8 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from config.fastapi_app import fastapi_app as app
+
 
 ###########
 # Logging #
@@ -55,30 +57,13 @@ async def loopback_config(request:config_data):
     """
     Receives request data in json format and configures mpls l3vpn
     """
-
+ 
     req = request.dict()
     print(req)
     connection_data = req.get('connection_data')
     loopback_data = req.get('loopback_data')
     loopback_number = loopback_data.get('loopback_number')
-    # print(loopback_data)
 
-    try:
-        ncc = NetconfHandler(**connection_data)
-        ncc_connection = ncc.connection()
-        logger.info("\n [+] Netconf Connection successfully established")    
-    except Exception as e:
-        logger.warning(f"\n [+] Connection Failure: \n {e}")
- 
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"Connection Failure",
-            "data": f"{e}"
-        }),
-        )
-        
     template = "loopback_interface.xml"
 
     file_loader = FileSystemLoader("dependencies/xml_templates/")
@@ -86,22 +71,43 @@ async def loopback_config(request:config_data):
     template = env.get_template(template)
     loopback_payload = template.render(data=loopback_data)
 
-    print(loopback_payload)   
+    if app.state.dry_run:
+        response_message = "dry_run feature is enabled"
+        response_data = loopback_payload
+    else:
+        try:
+            ncc = NetconfHandler(**connection_data)
+            ncc_connection = ncc.connection()
+            logger.info("\n [+] Netconf Connection successfully established")    
+        except Exception as e:
+            logger.warning(f"\n [+] Connection Failure: \n {e}")
+    
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"Connection Failure",
+                "data": f"{e}"
+            }),
+            )
 
-    # Send NETCONF <edit-config>
-    # try:
-    with ncc_connection.locked(target='candidate'):
+        # Send NETCONF <edit-config>
+        # try:
+        with ncc_connection.locked(target='candidate'):
+            
+            ncc_connection.edit_config(loopback_payload, target="candidate")
+            ncc_connection.commit()
+            ncc.save_config(ncc_connection)
         
-        ncc_connection.edit_config(loopback_payload, target="candidate")
-        ncc_connection.commit()
-        ncc.save_config(ncc_connection)
+        response_message = "operation is successfully done"
+        response_data = f"The loopback {loopback_number} successfully configured"
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
-            "message":"",
-            "data": f"The loopback {loopback_number} successfully configured"
+            "message":response_message,
+            "data": response_data
         }),
     )
 

@@ -21,6 +21,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from config.fastapi_app import fastapi_app as app
 
 ###########
 # Logging #
@@ -55,55 +56,61 @@ async def mpbgp_delete(request:config_data):
     bgp_local_asn = req.get('bgp_local_asn')
     mpbgp_data['delete'] = True
     
-    try:
-        ncc = NetconfHandler(**connection_data)
-        ncc_connection = ncc.connection()
-        logger.info("\n [+] Netconf Connection successfully established")    
-    except Exception as e:
-        logger.warning(f"\n [+] Connection Failure: \n {e}")
- 
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"Connection Failure",
-            "data": f"{e}"
-        }),
-        )
-        
     template = "mp_bgp.xml"
-
     file_loader = FileSystemLoader("dependencies/xml_templates/")
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     mpbgp_payload = template.render(data=mpbgp_data)
-
-    print(mpbgp_payload)   
-
-    # Send NETCONF <edit-config>
-    try:
-        with ncc_connection.locked(target='candidate'):
-
-            ncc_connection.edit_config(mpbgp_payload, target="candidate")
-            ncc_connection.commit()
-            ncc.save_config(ncc_connection)
+    
+    if app.state.dry_run:
+        response_message = "dry_run feature is enabled"
+        response_data = mpbgp_payload
+    else:
+        
+        try:
+            ncc = NetconfHandler(**connection_data)
+            ncc_connection = ncc.connection()
+            logger.info("\n [+] Netconf Connection successfully established")    
+        except Exception as e:
+            logger.warning(f"\n [+] Connection Failure: \n {e}")
+    
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"Connection Failure",
+                "data": f"{e}"
+            }),
+            )
             
-    except Exception as e:
-        return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"The operation failed",
-            "data": [f"1-Check the BGP ASN","2-Check if the BGP configuration is existed" ]
-        }),
-        )
+
+        # Send NETCONF <edit-config>
+        try:
+            with ncc_connection.locked(target='candidate'):
+
+                ncc_connection.edit_config(mpbgp_payload, target="candidate")
+                ncc_connection.commit()
+                ncc.save_config(ncc_connection)
+                
+                response_message = "operation is successfully done"
+                response_data = "BGP configuration successfully removed"
+                
+        except Exception as e:
+            return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"The operation failed",
+                "data": [f"1-Check the BGP ASN","2-Check if the BGP configuration is existed" ]
+            }),
+            )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
-            "message":"",
-            "data": "BGP configuration successfully removed"
+            "message":response_message,
+            "data": response_data
         }),
     )
 
