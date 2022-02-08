@@ -24,8 +24,8 @@ from routers.mpls_api.l3vpn import config_loopback
 from routers.mpls_api.l3vpn import config_mpbgp
 from routers.mpls_api.l3vpn import config_vrf
 from routers.general_apis import change_dry_run
-from routers.mpls_api.underlay import edit_config as underlay_edit_config
-from routers.mpls_api.underlay import get_config as underlay_get_config
+from routers.mpls_api.underlay import cli_config_interface
+from routers.mpls_api.underlay import cli_verify_underlay_mpls
 from config.security import get_api_key
 from config.log import logger
 from config.fastapi_app import fastapi_app
@@ -39,8 +39,8 @@ app.include_router(l3vpn_get_config.router)
 app.include_router(change_dry_run.router)
 
 app.include_router(l3vpn_edit_config.router)
-app.include_router(underlay_get_config.router)
-app.include_router(underlay_edit_config.router)
+app.include_router(cli_config_interface.router)
+app.include_router(cli_verify_underlay_mpls.router)
 
 app.include_router(config_loopback.router)
 app.include_router(config_mpbgp.router)

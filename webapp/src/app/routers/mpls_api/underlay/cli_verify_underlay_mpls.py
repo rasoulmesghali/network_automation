@@ -33,7 +33,7 @@ class connectionData(BaseModel):
     password: str
     device_type: str
     
-@router.post("/mpls/underlay/get-config/", tags=["mpls underlay get config"])
+@router.post("/mpls/underlay/get-config/", tags=["cli verify mpls config"])
 async def get_config(request: connectionData):
     
     """

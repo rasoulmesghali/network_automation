@@ -20,6 +20,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.cli_handler import CliHandler
+from config.fastapi_app import fastapi_app as app
 
 ###########
 # Logging #
@@ -50,7 +51,7 @@ class interface_request_data(BaseModel):
     ospf_area_id: Optional[str] = None
     
     
-@router.post("/interface/edit-config/", tags=["mpls underlay edit config"])
+@router.post("/interface/edit-config/", tags=["cli interface config"])
 async def edit_config(request:interface_request_data):
     
     """
@@ -58,26 +59,7 @@ async def edit_config(request:interface_request_data):
 
     """
     req = request.dict()
-    try:
-        connection_data = req.get('connection_data')
-        ssh = CliHandler(**connection_data)
-        ssh.connection()
-        logger.info("\n [+] SSH Connection successfully established")
-        
-    except Exception as e:
-        logger.warning(f"\n [+] Connection Failure: \n {e}")
-        exception_list = f"{e}".replace("\n\n", "$").replace("\n", "$").split('$')
-        exception_list.remove("")
-        
-        return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({
-            "status": "failure",
-            "message":"Connection Failure",
-            "data": exception_list
-        }),
-        )
-
+    
     interface = Interface(req.get('type'), req.get('number'))
     interface_cfg = interface.definition()\
                                 .enable()\
@@ -86,17 +68,44 @@ async def edit_config(request:interface_request_data):
                                             .ospf_config(req.get('ospf_pid'), req.get('ospf_area_id'))
     commands = interface_cfg.build()
     
-    result = ssh.connection().send_config_set(commands)
+    if app.state.dry_run:
+        response_message = "dry_run feature is enabled"
+        response_data = commands
+    else:
+        try:
+            connection_data = req.get('connection_data')
+            ssh = CliHandler(**connection_data)
+            ssh.connection()
+            logger.info("\n [+] SSH Connection successfully established")
+            
+        except Exception as e:
+            logger.warning(f"\n [+] Connection Failure: \n {e}")
+            exception_list = f"{e}".replace("\n\n", "$").replace("\n", "$").split('$')
+            exception_list.remove("")
+            
+            return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"Connection Failure",
+                "data": exception_list
+            }),
+            )
 
-    ssh.disconnect()
-    logger.info("\n [+] SSH Connection closed")
+        result = ssh.connection().send_config_set(commands)
+
+        ssh.disconnect()
+        logger.info("\n [+] SSH Connection closed")
+        
+        response_message = "operation is successfully done"
+        response_data = f"The interface successfully configured"
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "status": "success",
-            "message":"required commands are successfully sent",
-            "data": commands
+            "message":response_message,
+            "data": response_data
         }),
     )
 
