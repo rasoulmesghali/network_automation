@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "c252cc4d-a39d-445a-8150-25360953ffa3",
+		"name": "Network Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "cli_interface_config",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n\n    \"type\":\"gig\", \n    \"number\": 2, \n    \"ip\": \"10.10.10.2\", \n    \"mask\": \"255.255.255.0\",\n    \"enable\": true,\n    \"mpls\": true,\n    \"ospf\": true,\n    \"ospf_pid\": 1,\n    \"ospf_area_id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/interface/edit-config/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"interface",
+						"edit-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cli_mpls_underlay_verifications",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"hostname\": \"192.168.1.14\",\n    \"port\": 22,\n    \"username\": \"admin\",\n    \"password\": \"admin\",\n    \"device_type\": \"cisco_xe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/underlay/get-config/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"underlay",
+						"get-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_vrf_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n        \n    \"vrf_name\":\"vpn1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/vrf-delete/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"vrf-delete",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_vrf_config",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n    \"vrf_data\":{\n        \"vrf_name\":\"vpn1\", \n        \"vrf_rd\": \"100:1\", \n        \"vrf_export_rt\": \"100:1\",\n        \"vrf_import_rt\": \"100:1\"\n        }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/vrf-config/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"vrf-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_mpbgp_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n    \"bgp_local_asn\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/mpbgp-delete/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"mpbgp-delete",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_mpbgp_config",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n    \"mpbgp_data\": {\n        \"bgp_local_asn\": 100,\n        \"bgp_router_id\": \"1.1.1.1\",\n        \"neighbor_data\":[\n            {\n            \"unicast\":true,\n            \"vpnv4\": true,\n            \"vrf_name\":\"vpn1\", \n            \"bgp_neighbor_addr\": \"2.2.2.2\",\n            \"bgp_remote_asn\": 100,\n            \"bgp_source_loopback\": 0\n        }]\n        }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/mpbgp-config/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"mpbgp-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_loopback_config",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n\n    \"loopback_data\":{\n        \"vrf_name\":\"vpn1\", \n        \"loopback_number\": 111,\n        \"ipv4\": \"10.10.10.10\",\n        \"ipv4_mask\": \"255.255.255.255\"\n        }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/loopback-config/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"loopback-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nc_loopback_delete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n\n    \"loopback_number\": 111\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/loopback-delete/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"loopback-delete",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dry-run",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"dry_run\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/feature/dryrun/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"feature",
+						"dryrun",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
