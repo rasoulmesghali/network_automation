@@ -1,5 +1,5 @@
 # General libraries
-import json
+from time import time
 from collections import defaultdict
 import logging
 import os
@@ -7,7 +7,6 @@ import sys
 from bcrypt import re
 from loguru import logger
 from typing import List
-import time
 
 # Pydantic schema validation
 from typing import Optional
@@ -100,15 +99,34 @@ async def mpbgp_config(request:config_data):
             )
             
         # Send NETCONF <edit-config>
-        # try:
-        with ncc_connection.locked(target='candidate'):
+        try:
+            with ncc_connection.locked(target='candidate'):
 
-            ncc_connection.edit_config(mpbgp_payload, target="candidate")
-            ncc_connection.commit()
-            ncc.save_config(ncc_connection)
+                ncc_connection.edit_config(mpbgp_payload, target="candidate")
+                ncc_connection.commit()
+                ncc.save_config(ncc_connection)
+                
+            # Storing data into mongodb database
+            storing_document = {}
+            storing_document['timestamp'] = time()
+            storing_document['operation'] = "edit"
+            storing_document['config_parameters'] = mpbgp_data
+            storing_document['pyload'] = mpbgp_payload
+
+            await app.monogodb_db.db1.insert_one(storing_document)
             
-        response_message = "operation is successfully done"
-        response_data = "BGP successfully configured"
+            response_message = "operation is successfully done"
+            response_data = "BGP successfully configured"
+                
+        except Exception as e:
+            return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"The operation failed",
+                "data": [f"Check Source address", "Check ASN and Router ID", "Check if vrf is existed" ]
+            }),
+            )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

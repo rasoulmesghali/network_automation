@@ -1,8 +1,6 @@
 # General libraries
 import os
-import asyncio
-import typing
-import pydantic
+from functools import lru_cache
 
 # Mongodb async library
 import motor.motor_asyncio
@@ -29,6 +27,11 @@ from routers.mpls_api.underlay import cli_verify_underlay_mpls
 from config.security import get_api_key
 from config.log import logger
 from config.fastapi_app import fastapi_app
+from config import env
+
+@lru_cache()
+def get_settings():
+    return env.Settings()
 
 # Fastapi App
 app = fastapi_app
@@ -52,9 +55,8 @@ app.include_router(delete_bgp.router)
 @app.on_event("startup")
 async def startup_db_client() -> None:
 
-    default_mongo = "mongodb://root:root@mongodb:27017"
-    app.mongodb_client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGO_DB_URL", default_mongo))
-    app.mongodb = app.mongodb_client[os.environ.get("MONGO_DB_NAME", "webapp")]
+    app.mongodb_client = motor.motor_asyncio.AsyncIOMotorClient(get_settings().monogodb_url)
+    app.monogodb_db = app.mongodb_client[get_settings().monogodb_db]
 
 
 @app.on_event("startup")

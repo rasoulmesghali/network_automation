@@ -7,7 +7,7 @@ import sys
 from bcrypt import re
 from loguru import logger
 from typing import List
-import time
+from time import time
 
 # Pydantic schema validation
 from typing import Optional
@@ -90,15 +90,34 @@ async def vrf_config(request:config_data):
             )
     
         # Send NETCONF <edit-config>
-        # try:
-        with ncc_connection.locked(target='candidate'):
-            
-            ncc_connection.edit_config(vrf_payload, target="candidate")        
-            ncc_connection.commit()
-            ncc.save_config(ncc_connection)
+        try:
+            with ncc_connection.locked(target='candidate'):
+                
+                ncc_connection.edit_config(vrf_payload, target="candidate")        
+                ncc_connection.commit()
+                ncc.save_config(ncc_connection)
 
-        response_message = "operation is successfully done"
-        response_data = "vrf successfully created"
+            # Storing data into mongodb database
+            storing_document = {}
+            storing_document['timestamp'] = time()
+            storing_document['operation'] = "edit"
+            storing_document['config_parameters'] = vrf_data
+            storing_document['pyload'] = vrf_payload
+
+            await app.monogodb_db.db1.insert_one(storing_document)
+            
+            response_message = "operation is successfully done"
+            response_data = "vrf successfully created"
+            
+        except Exception as e:
+            return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"The operation failed",
+                "data": "Check existing vrf with similar configuration"
+            }),
+            )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

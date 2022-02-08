@@ -47,7 +47,9 @@ async def dryrun_config(request:config_data):
     req = request.dict()
     dry_run = req.get('dry_run')
     app.state.dry_run = dry_run
-        
+    
+    logger.info("\n [+] Dry_run changed to {dry_run}") 
+    
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({

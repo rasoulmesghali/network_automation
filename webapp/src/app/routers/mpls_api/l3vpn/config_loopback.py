@@ -7,7 +7,7 @@ import sys
 from bcrypt import re
 from loguru import logger
 from typing import List
-import time
+from time import time
 
 # Pydantic schema validation
 from typing import Optional
@@ -57,7 +57,7 @@ async def loopback_config(request:config_data):
     """
     Receives request data in json format and configures mpls l3vpn
     """
- 
+          
     req = request.dict()
     print(req)
     connection_data = req.get('connection_data')
@@ -92,15 +92,34 @@ async def loopback_config(request:config_data):
             )
 
         # Send NETCONF <edit-config>
-        # try:
-        with ncc_connection.locked(target='candidate'):
+        try:
+            with ncc_connection.locked(target='candidate'):
+                
+                ncc_connection.edit_config(loopback_payload, target="candidate")
+                ncc_connection.commit()
+                ncc.save_config(ncc_connection)
+                
+            # Storing data into mongodb database
+            storing_document = {}
+            storing_document['timestamp'] = time()
+            storing_document['operation'] = "edit"
+            storing_document['config_parameters'] = loopback_data
+            storing_document['pyload'] = loopback_payload
+
+            await app.monogodb_db.db1.insert_one(storing_document)
             
-            ncc_connection.edit_config(loopback_payload, target="candidate")
-            ncc_connection.commit()
-            ncc.save_config(ncc_connection)
-        
-        response_message = "operation is successfully done"
-        response_data = f"The loopback {loopback_number} successfully configured"
+            response_message = "operation is successfully done"
+            response_data = f"The loopback {loopback_number} successfully configured"
+                
+        except Exception as e:
+            return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"The operation failed",
+                "data": [f"Check loopback number", "Check the ip address and mask", "Check if vrf is existed" ]
+            }),
+            )
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,

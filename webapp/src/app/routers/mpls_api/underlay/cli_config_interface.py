@@ -1,5 +1,5 @@
 # General libraries
-import json
+from time import time
 from collections import defaultdict
 import logging
 import os
@@ -96,6 +96,17 @@ async def edit_config(request:interface_request_data):
 
         ssh.disconnect()
         logger.info("\n [+] SSH Connection closed")
+        
+        # Storing data into mongodb database
+        config_parameters = req
+        del config_parameters['connection_data']
+        storing_document = {}
+        storing_document['timestamp'] = time()
+        storing_document['operation'] = "edit"
+        storing_document['config_parameters'] = config_parameters
+        storing_document['pyload'] = commands
+
+        await app.monogodb_db.db1.insert_one(storing_document)
         
         response_message = "operation is successfully done"
         response_data = f"The interface successfully configured"

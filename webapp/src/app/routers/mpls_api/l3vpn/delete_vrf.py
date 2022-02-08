@@ -7,7 +7,7 @@ import sys
 from bcrypt import re
 from loguru import logger
 from typing import List
-import time
+from time import time
 
 # Pydantic schema validation
 from typing import Optional
@@ -64,7 +64,7 @@ async def vrf_delete(request:config_data):
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     vrf_payload = template.render(data=vrf_data)
-    
+
     if app.state.dry_run:
         response_message = "dry_run feature is enabled"
         response_data = vrf_payload
@@ -94,6 +94,19 @@ async def vrf_delete(request:config_data):
                 ncc_connection.commit()
                 ncc.save_config(ncc_connection)
 
+            # Storing data into mongodb database
+            storing_document = {}
+            storing_document['timestamp'] = time()
+            storing_document['operation'] = "delete"
+            storing_document['config_parameters'] = {}
+            storing_document['config_parameters']['vrf_name'] = vrf_name
+            storing_document['pyload'] = vrf_payload
+
+            await app.monogodb_db.db1.insert_one(storing_document)
+
+            response_message = "operation is successfully done"
+            response_data = f"vrf {vrf_name} successfully removed"
+                
         except Exception as e:
             return JSONResponse(
             status_code=status.HTTP_200_OK,
@@ -103,8 +116,7 @@ async def vrf_delete(request:config_data):
                 "data": [f"1-Make sure there is no interface member of the vrf","2-check bgp configurations" ]
             }),
             )
-        response_message = "operation is successfully done"
-        response_data = f"vrf {vrf_name} successfully removed"
+
         
     return JSONResponse(
         status_code=status.HTTP_200_OK,

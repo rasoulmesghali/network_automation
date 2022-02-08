@@ -9,16 +9,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
 
     env_file:
       - .env
     ports:
       - 27017:27017
     volumes:
-        - ./.docker/mongodb/mongod.conf:/etc/mongod.conf
-        - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
-        - ./.docker/mongodb/data/db/:/data/db/
-        - ./.docker/mongodb/data/log/:/var/log/mongodb/
         - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   webapp:
@@ -37,4 +34,4 @@ services:
       api_key_name: API-KEY
       log_level: INFO
     ports:
-      - "8000:80"
+      - "800:80"
