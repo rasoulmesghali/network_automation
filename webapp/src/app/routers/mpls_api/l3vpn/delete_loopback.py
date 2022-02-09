@@ -23,6 +23,10 @@ from fastapi.encoders import jsonable_encoder
 from dependencies.handlers.netconf_handler import NetconfHandler
 from config.fastapi_app import fastapi_app as app
 
+BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+module_path = os.path.join(BASE_DIR)
+sys.path.append(module_path)
+
 ###########
 # Logging #
 ###########
@@ -45,7 +49,7 @@ class config_data(BaseModel):
 
 
 @router.delete("/mpls/l3vpn/loopback-delete/", tags=["loopback delete"])
-async def loopback_delete(request:config_data):
+async def loopback_delete(request:config_data, app_req:Request):
     
     """
     Receives request data in json format and configures mpls l3vpn
@@ -60,7 +64,7 @@ async def loopback_delete(request:config_data):
 
     template = "loopback_interface.xml"
 
-    file_loader = FileSystemLoader("dependencies/xml_templates/")
+    file_loader = FileSystemLoader(os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/"))
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     loopback_payload = template.render(data=loopback_data)
@@ -102,7 +106,7 @@ async def loopback_delete(request:config_data):
             storing_document['config_parameters']['loopback_number'] = loopback_number
             storing_document['pyload'] = loopback_payload
 
-            await app.monogodb_db.db1.insert_one(storing_document)
+            await app_req.app.monogodb_db.db1.insert_one(storing_document)
             
             response_message = "operation is successfully done"
             response_data = f"loopback {loopback_number} successfully removed"

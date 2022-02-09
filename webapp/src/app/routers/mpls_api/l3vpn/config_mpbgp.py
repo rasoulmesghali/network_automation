@@ -22,6 +22,10 @@ from fastapi.encoders import jsonable_encoder
 from dependencies.handlers.netconf_handler import NetconfHandler
 from config.fastapi_app import fastapi_app as app
 
+BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+module_path = os.path.join(BASE_DIR)
+sys.path.append(module_path)
+
 ###########
 # Logging #
 ###########
@@ -58,21 +62,20 @@ class config_data(BaseModel):
 
 
 @router.post("/mpls/l3vpn/mpbgp-config/", tags=["mpbgp config"])
-async def mpbgp_config(request:config_data):
+async def mpbgp_config(request:config_data, app_req:Request):
     
     """
     Receives request data in json format and configures mpls l3vpn
     """
 
     req = request.dict()
-    print(req)
     connection_data = req.get('connection_data')
     mpbgp_data = req.get('mpbgp_data')
     
     
     template = "mp_bgp.xml"
 
-    file_loader = FileSystemLoader("dependencies/xml_templates/")
+    file_loader = FileSystemLoader(os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/"))
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     mpbgp_payload = template.render(data=mpbgp_data)
@@ -113,7 +116,7 @@ async def mpbgp_config(request:config_data):
             storing_document['config_parameters'] = mpbgp_data
             storing_document['pyload'] = mpbgp_payload
 
-            await app.monogodb_db.db1.insert_one(storing_document)
+            await app_req.app.monogodb_db.db1.insert_one(storing_document)
             
             response_message = "operation is successfully done"
             response_data = "BGP successfully configured"

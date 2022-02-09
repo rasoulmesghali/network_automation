@@ -23,6 +23,10 @@ from fastapi.encoders import jsonable_encoder
 from dependencies.handlers.netconf_handler import NetconfHandler
 from config.fastapi_app import fastapi_app as app
 
+BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+module_path = os.path.join(BASE_DIR)
+sys.path.append(module_path)
+
 ###########
 # Logging #
 ###########
@@ -44,7 +48,7 @@ class config_data(BaseModel):
     bgp_local_asn: int
 
 @router.delete("/mpls/l3vpn/mpbgp-delete/", tags=["mpbgp delete"])
-async def mpbgp_delete(request:config_data):
+async def mpbgp_delete(request:config_data, app_req:Request):
     
     """
     Receives request data in json format and configures mpls l3vpn
@@ -57,7 +61,7 @@ async def mpbgp_delete(request:config_data):
     mpbgp_data['delete'] = True
     
     template = "mp_bgp.xml"
-    file_loader = FileSystemLoader("dependencies/xml_templates/")
+    file_loader = FileSystemLoader(os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/"))
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     mpbgp_payload = template.render(data=mpbgp_data)
@@ -100,7 +104,7 @@ async def mpbgp_delete(request:config_data):
             storing_document['config_parameters']['bgp_local_asn'] = bgp_local_asn
             storing_document['pyload'] = mpbgp_payload
 
-            await app.monogodb_db.db1.insert_one(storing_document)
+            await app_req.app.monogodb_db.db1.insert_one(storing_document)
             
             response_message = "operation is successfully done"
             response_data = "BGP configuration successfully removed"

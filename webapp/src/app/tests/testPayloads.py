@@ -1,7 +1,7 @@
 cli_interface_config = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 22,
         "username": "admin",
         "password": "admin",
@@ -22,7 +22,7 @@ cli_interface_config = """
 
 cli_mpls_underlay_verifications ="""
 {
-    "hostname": "192.168.1.14",
+    "hostname": "192.168.1.6",
     "port": 22,
     "username": "admin",
     "password": "admin",
@@ -31,19 +31,23 @@ cli_mpls_underlay_verifications ="""
 """
 
 nc_vrf_delete = """
-{
-    "hostname": "192.168.1.14",
-    "port": 22,
-    "username": "admin",
-    "password": "admin",
-    "device_type": "cisco_xe"
+{   
+    "connection_data":{
+        "hostname": "192.168.1.6",
+        "port": 830,
+        "username": "admin",
+        "password": "admin",
+        "device_type": "iosxe"
+        },
+
+    "vrf_name":"vpn1"
 }
 """
 
 nc_vrf_config = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 830,
         "username": "admin",
         "password": "admin",
@@ -62,7 +66,7 @@ nc_vrf_config = """
 nc_mpbgp_delete = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 830,
         "username": "admin",
         "password": "admin",
@@ -76,7 +80,7 @@ nc_mpbgp_delete = """
 nc_mpbgp_config = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 830,
         "username": "admin",
         "password": "admin",
@@ -102,7 +106,7 @@ nc_mpbgp_config = """
 nc_loopback_config = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 830,
         "username": "admin",
         "password": "admin",
@@ -120,13 +124,12 @@ nc_loopback_config = """
 nc_loopback_delete = """
 {   
     "connection_data":{
-        "hostname": "192.168.1.14",
+        "hostname": "192.168.1.6",
         "port": 830,
         "username": "admin",
         "password": "admin",
         "device_type": "iosxe"
         },
-
     "loopback_number": 111
 }
 """

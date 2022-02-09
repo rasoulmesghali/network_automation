@@ -22,6 +22,10 @@ from fastapi.encoders import jsonable_encoder
 from dependencies.handlers.cli_handler import CliHandler
 from config.fastapi_app import fastapi_app as app
 
+BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+module_path = os.path.join(BASE_DIR)
+sys.path.append(module_path)
+
 ###########
 # Logging #
 ###########
@@ -52,7 +56,7 @@ class interface_request_data(BaseModel):
     
     
 @router.post("/interface/edit-config/", tags=["cli interface config"])
-async def edit_config(request:interface_request_data):
+async def edit_config(request:interface_request_data, app_req:Request):
     
     """
     Receives request data in json format and configures cisco csr1000v interfaces
@@ -106,7 +110,7 @@ async def edit_config(request:interface_request_data):
         storing_document['config_parameters'] = config_parameters
         storing_document['pyload'] = commands
 
-        await app.monogodb_db.db1.insert_one(storing_document)
+        await app_req.app.monogodb_db.db1.insert_one(storing_document)
         
         response_message = "operation is successfully done"
         response_data = f"The interface successfully configured"
