@@ -7,6 +7,7 @@ import sys
 from bcrypt import re
 from loguru import logger
 from typing import List
+from functools import lru_cache
 
 # Pydantic schema validation
 from typing import Optional
@@ -21,6 +22,11 @@ from fastapi.encoders import jsonable_encoder
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
 from config.fastapi_app import fastapi_app as app
+from config import env
+
+@lru_cache()
+def get_settings():
+    return env.Settings()
 
 BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
 module_path = os.path.join(BASE_DIR)
@@ -116,7 +122,7 @@ async def mpbgp_config(request:config_data, app_req:Request):
             storing_document['config_parameters'] = mpbgp_data
             storing_document['pyload'] = mpbgp_payload
 
-            await app_req.app.monogodb_db.db1.insert_one(storing_document)
+            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
             
             response_message = "operation is successfully done"
             response_data = "BGP successfully configured"

@@ -41,7 +41,7 @@ def get_settings():
 # Fastapi App
 app = fastapi_app
 app.state.logger = logger
-
+app.test_env = False
 
 app.include_router(l3vpn_get_config.router, dependencies=[Security(get_api_key)])
 app.include_router(change_dry_run.router, dependencies=[Security(get_api_key)])
@@ -59,9 +59,11 @@ app.include_router(delete_vrf.router, dependencies=[Security(get_api_key)])
 app.include_router(delete_bgp.router, dependencies=[Security(get_api_key)])
 @app.on_event("startup")
 async def startup_db_client() -> None:
-
     app.mongodb_client = motor.motor_asyncio.AsyncIOMotorClient(get_settings().monogodb_url)
-    app.monogodb_db = app.mongodb_client[get_settings().monogodb_db]
+    if app.test_env:
+        app.monogodb_db = app.mongodb_client["testdb"]
+    else:
+        app.monogodb_db = app.mongodb_client[get_settings().monogodb_db]
 
 
 @app.on_event("startup")

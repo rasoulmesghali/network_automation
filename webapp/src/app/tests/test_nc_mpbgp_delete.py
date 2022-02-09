@@ -17,6 +17,7 @@ def get_settings():
     return env.Settings()
 
 api_key =  get_settings().api_key
+app.test_env = True
 
 @pytest.fixture
 def client():
