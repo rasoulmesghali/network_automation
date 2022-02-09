@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
 # Internal modules
+from config.security import api_key
 from routers.mpls_api.l3vpn import edit_config as l3vpn_edit_config
 from routers.mpls_api.l3vpn import get_config as l3vpn_get_config
 from routers.mpls_api.l3vpn import delete_loopback
@@ -37,21 +38,21 @@ def get_settings():
 app = fastapi_app
 app.state.logger = logger
 
-# app.include_router(mplsapi.router, dependencies=[Security(get_api_key)])
-app.include_router(l3vpn_get_config.router)
-app.include_router(change_dry_run.router)
 
-app.include_router(l3vpn_edit_config.router)
-app.include_router(cli_config_interface.router)
-app.include_router(cli_verify_underlay_mpls.router)
+app.include_router(l3vpn_get_config.router, dependencies=[Security(get_api_key)])
+app.include_router(change_dry_run.router, dependencies=[Security(get_api_key)])
 
-app.include_router(config_loopback.router)
-app.include_router(config_mpbgp.router)
-app.include_router(config_vrf.router)
+app.include_router(l3vpn_edit_config.router, dependencies=[Security(get_api_key)])
+app.include_router(cli_config_interface.router, dependencies=[Security(get_api_key)])
+app.include_router(cli_verify_underlay_mpls.router, dependencies=[Security(get_api_key)])
 
-app.include_router(delete_loopback.router)
-app.include_router(delete_vrf.router)
-app.include_router(delete_bgp.router)
+app.include_router(config_loopback.router, dependencies=[Security(get_api_key)])
+app.include_router(config_mpbgp.router, dependencies=[Security(get_api_key)])
+app.include_router(config_vrf.router, dependencies=[Security(get_api_key)])
+
+app.include_router(delete_loopback.router, dependencies=[Security(get_api_key)])
+app.include_router(delete_vrf.router, dependencies=[Security(get_api_key)])
+app.include_router(delete_bgp.router, dependencies=[Security(get_api_key)])
 @app.on_event("startup")
 async def startup_db_client() -> None:
 

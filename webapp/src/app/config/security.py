@@ -1,9 +1,14 @@
 from fastapi import Security , HTTPException , status
 from fastapi.security.api_key import APIKeyHeader
 import os
+from config import env
 
-api_key_name = os.environ.get("api_key_name",'API-KEY')
-api_key =  os.environ.get("api_key",'1234567890')
+
+def get_settings():
+    return env.Settings()
+
+api_key_name = get_settings().api_key_name
+api_key =  get_settings().api_key
 
 api_key_header_auth = APIKeyHeader(name=api_key_name, auto_error=True)
 

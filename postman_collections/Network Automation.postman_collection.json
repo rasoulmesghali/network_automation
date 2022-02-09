@@ -9,10 +9,16 @@
 			"name": "cli_interface_config",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n\n    \"type\":\"gig\", \n    \"number\": 2, \n    \"ip\": \"10.10.10.2\", \n    \"mask\": \"255.255.255.0\",\n    \"enable\": true,\n    \"mpls\": true,\n    \"ospf\": true,\n    \"ospf_pid\": 1,\n    \"ospf_area_id\": 1\n}",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n\n    \"type\":\"loopback\", \n    \"number\": 20, \n    \"ip\": \"110.20.10.2\", \n    \"mask\": \"255.255.255.0\",\n    \"enable\": true,\n    \"mpls\": true,\n    \"ospf\": true,\n    \"ospf_pid\": 1,\n    \"ospf_area_id\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -44,9 +50,9 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -81,14 +87,14 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n        \n    \"vrf_name\":\"vpn1\"\n}",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n\n    \"vrf_name\":\"vpn1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -118,9 +124,9 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -155,9 +161,9 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -192,9 +198,9 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -229,14 +235,14 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n\n    \"loopback_data\":{\n        \"vrf_name\":\"vpn1\", \n        \"loopback_number\": 111,\n        \"ipv4\": \"10.10.10.10\",\n        \"ipv4_mask\": \"255.255.255.255\"\n        }\n}",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 830,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"iosxe\"\n        },\n    \"loopback_data\":{\n        \"vrf_name\":\"vpn1\", \n        \"loopback_number\": 111,\n        \"ipv4\": \"110.10.10.10\",\n        \"ipv4_mask\": \"255.255.255.255\"\n        }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -266,9 +272,9 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -303,14 +309,14 @@
 				"method": "PATCH",
 				"header": [
 					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt_token}}",
-						"type": "default"
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"dry_run\": \"true\"\n}",
+					"raw": "{\n    \"dry_run\": true\n}",
 					"options": {
 						"raw": {
 							"language": "json"
