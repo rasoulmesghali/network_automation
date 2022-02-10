@@ -72,7 +72,6 @@ async def edit_config(request:config_data):
     loopback_data = req.get('loopback_data')
     mpbgp_data = req.get('mpbgp_data')
     
-    print(req)
     try:
         ncc = NetconfHandler(**connection_data)
         ncc_connection = ncc.connection()
@@ -98,8 +97,6 @@ async def edit_config(request:config_data):
         
     mpbgp_template = open("dependencies/xml_templates/mp_bgp.xml").read()
     mpbgp_payload = mpbgp_template.format(**mpbgp_data, **vrf_data)
-
-    print(loopback_payload)
 
     # Send NETCONF <edit-config>
     # try:

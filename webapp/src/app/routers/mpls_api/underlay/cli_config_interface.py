@@ -107,19 +107,26 @@ async def edit_config(request:interface_request_data, app_req:Request):
         ssh.disconnect()
         logger.info("\n [+] SSH Connection closed")
         
+        response_message = "operation is successfully done"
+        response_data = f"The interface successfully configured"
+        
         # Storing data into mongodb database
         config_parameters = req
         del config_parameters['connection_data']
         storing_document = {}
         storing_document['timestamp'] = time()
+        storing_document['target_host'] = connection_data.get('hostname')
         storing_document['operation'] = "edit"
         storing_document['config_parameters'] = config_parameters
         storing_document['pyload'] = commands
 
-        await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
+        try:
+            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
+        except Exception as e:
+            logger.warning("\n [+] Mongodb connection failure, check connectiong settings")
         
-        response_message = "operation is successfully done"
-        response_data = f"The interface successfully configured"
+            response_message = "operation is successfully done"
+            response_data = f"database connection failure, however, The interface successfully configured"
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,

@@ -29,10 +29,6 @@ from config import env
 def get_settings():
     return env.Settings()
 
-BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
-module_path = os.path.join(BASE_DIR)
-sys.path.append(module_path)
-
 ###########
 # Logging #
 ###########
@@ -70,7 +66,16 @@ async def loopback_delete(request:config_data, app_req:Request):
 
     template = "loopback_interface.xml"
 
-    file_loader = FileSystemLoader(os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/"))
+    if app_req.app.test_env:
+        BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+        module_path = os.path.join(BASE_DIR)
+        sys.path.append(module_path)
+
+        template_path = os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/")
+    else:
+        template_path = "dependencies/xml_templates/"
+        
+    file_loader = FileSystemLoader(template_path)
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     loopback_payload = template.render(data=loopback_data)
@@ -104,18 +109,8 @@ async def loopback_delete(request:config_data, app_req:Request):
                 ncc_connection.commit()
                 ncc.save_config(ncc_connection)
                 
-            # Storing data into mongodb database
-            storing_document = {}
-            storing_document['timestamp'] = time()
-            storing_document['operation'] = "delete"
-            storing_document['config_parameters'] = {}
-            storing_document['config_parameters']['loopback_number'] = loopback_number
-            storing_document['pyload'] = loopback_payload
-
-            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
-            
-            response_message = "operation is successfully done"
-            response_data = f"loopback {loopback_number} successfully removed"
+                response_message = "operation is successfully done"
+                response_data = f"loopback {loopback_number} successfully removed"
                 
         except Exception as e:
             return JSONResponse(
@@ -126,7 +121,24 @@ async def loopback_delete(request:config_data, app_req:Request):
                 "data": f"Loopback {loopback_number} does not exist"
             }),
             )
-        
+
+        # Storing data into mongodb database
+        storing_document = {}
+        storing_document['timestamp'] = time()
+        storing_document['target_host'] = connection_data.get('hostname')
+        storing_document['operation'] = "delete"
+        storing_document['config_parameters'] = {}
+        storing_document['config_parameters']['loopback_number'] = loopback_number
+        storing_document['pyload'] = loopback_payload
+
+        try:
+            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
+        except Exception as e:
+            logger.warning("\n [+] Mongodb connection failure, check connectiong settings")
+            
+            response_message = "operation is successfully done"
+            response_data = f"database connection failure, however, loopback {loopback_number} successfully removed"
+            
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({

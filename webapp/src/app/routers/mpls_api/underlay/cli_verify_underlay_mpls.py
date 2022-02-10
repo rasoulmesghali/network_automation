@@ -42,7 +42,7 @@ async def get_config(request: connectionData):
 
     """
     req = request.dict()
-    print(req)
+    
     try:
         connection_data = req
         ssh = CliHandler(**connection_data)
@@ -83,7 +83,6 @@ async def get_config(request: connectionData):
     for row in result.splitlines():
         match = ip_pattern.search(row)
         if match:
-            print(match)
             lst.append(match.group(0))
     
     ssh.disconnect()

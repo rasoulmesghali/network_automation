@@ -29,10 +29,6 @@ from config import env
 def get_settings():
     return env.Settings()
 
-BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
-module_path = os.path.join(BASE_DIR)
-sys.path.append(module_path)
-
 ###########
 # Logging #
 ###########
@@ -62,20 +58,27 @@ async def vrf_delete(request:config_data, app_req:Request):
     """
 
     req = request.dict()
-    print(req)
+
     connection_data = req.get('connection_data')
     vrf_name = req.get('vrf_name')
     vrf_data = req
     vrf_data['delete'] = True
 
+    if app_req.app.test_env:
+        BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
+        module_path = os.path.join(BASE_DIR)
+        sys.path.append(module_path)
+
+        template_path = os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/")
+    else:
+        template_path = "dependencies/xml_templates/"
+        
     template = "vrf.xml"
 
-    file_loader = FileSystemLoader(os.path.join(BASE_DIR,"src/app/dependencies/xml_templates/"))
+    file_loader = FileSystemLoader(template_path)
     env = Environment(loader=file_loader)
     template = env.get_template(template)
     vrf_payload = template.render(data=vrf_data)
-    
-    print(vrf_payload)
 
     if app.state.dry_run:
         response_message = "dry_run feature is enabled"
@@ -105,19 +108,9 @@ async def vrf_delete(request:config_data, app_req:Request):
                 ncc_connection.edit_config(vrf_payload, target="candidate")        
                 ncc_connection.commit()
                 ncc.save_config(ncc_connection)
-
-            # Storing data into mongodb database
-            storing_document = {}
-            storing_document['timestamp'] = time()
-            storing_document['operation'] = "delete"
-            storing_document['config_parameters'] = {}
-            storing_document['config_parameters']['vrf_name'] = vrf_name
-            storing_document['pyload'] = vrf_payload
-
-            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
-
-            response_message = "operation is successfully done"
-            response_data = f"vrf {vrf_name} successfully removed"
+                
+                response_message = "operation is successfully done"
+                response_data = f"vrf {vrf_name} successfully removed"
                 
         except Exception as e:
             return JSONResponse(
@@ -129,6 +122,22 @@ async def vrf_delete(request:config_data, app_req:Request):
             }),
             )
 
+        # Storing data into mongodb database
+        storing_document = {}
+        storing_document['timestamp'] = time()
+        storing_document['target_host'] = connection_data.get('hostname')
+        storing_document['operation'] = "delete"
+        storing_document['config_parameters'] = {}
+        storing_document['config_parameters']['vrf_name'] = vrf_name
+        storing_document['pyload'] = vrf_payload
+
+        try:
+            await app_req.app.monogodb_db[get_settings().monogodb_collection].insert_one(storing_document)
+        except Exception as e:
+            logger.warning("\n [+] Mongodb connection failure, check connectiong settings")
+
+            response_message = "operation is successfully done"
+            response_data = f"database connection failure, however, vrf {vrf_name} successfully removed"
         
     return JSONResponse(
         status_code=status.HTTP_200_OK,
