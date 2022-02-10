@@ -45,3 +45,8 @@ local setup:
 9- Use correct ip, username, password and device_type in order to connect the routers
 10- test APIs using postman collections and see the results
 ```
+
+### How to monogodb
+
+You need to setup db and with connection credentials and put inside the environment variable then connect to the db.
+There are a variety of options, I uses robo3t, https://robomongo.org/download
