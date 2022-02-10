@@ -102,12 +102,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{hostname}}:5000/mpls/l3vpn/ping_vrf/",
+					"raw": "http://{{hostname}}:{{port}}/mpls/l3vpn/ping_vrf/",
 					"protocol": "http",
 					"host": [
 						"{{hostname}}"
 					],
-					"port": "5000",
+					"port": "{{port}}",
 					"path": [
 						"mpls",
 						"l3vpn",
