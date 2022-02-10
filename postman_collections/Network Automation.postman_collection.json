@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.14\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n\n    \"type\":\"loopback\", \n    \"number\": 20, \n    \"ip\": \"110.20.10.2\", \n    \"mask\": \"255.255.255.0\",\n    \"enable\": true,\n    \"mpls\": true,\n    \"ospf\": true,\n    \"ospf_pid\": 1,\n    \"ospf_area_id\": 1\n}",
+					"raw": "{   \n    \"connection_data\":{\n        \"hostname\": \"192.168.1.6\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n\n    \"type\":\"loopback\", \n    \"number\": 20, \n    \"ip\": \"110.20.10.2\", \n    \"mask\": \"255.255.255.0\",\n    \"enable\": true,\n    \"mpls\": true,\n    \"ospf\": true,\n    \"ospf_pid\": 1,\n    \"ospf_area_id\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -75,6 +75,43 @@
 						"mpls",
 						"underlay",
 						"get-config",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cli_l3vpn_verifications",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "API-KEY",
+						"value": "1234567890",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"connection_data\":{\n        \"hostname\": \"192.168.1.6\",\n        \"port\": 22,\n        \"username\": \"admin\",\n        \"password\": \"admin\",\n        \"device_type\": \"cisco_xe\"\n        },\n    \"vrf_name\":\"vpn1\",\n    \"destination_ip\":\"220.10.10.10\",\n    \"source_ip\":\"110.10.10.10\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:5000/mpls/l3vpn/ping_vrf/",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "5000",
+					"path": [
+						"mpls",
+						"l3vpn",
+						"ping_vrf",
 						""
 					]
 				}
