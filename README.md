@@ -23,8 +23,8 @@ docker-compose setup:
 
 ```
 1- Have 2 CSR1000v virtual machines or real devices with IOSXE17 or higher version
-2- docker-compose build
-3- docker-compose up
+2- docker-compose build (you can use makefile instead)
+3- docker-compose up (you can use makefile instead)
 4- Import postman collection from "postman_collections" directory
 5- Turn on routers and setup ip, username, ssh, netconf, yang
 6- Use correct ip, username, password and device_type in order to connect the routers
