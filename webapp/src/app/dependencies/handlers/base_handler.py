@@ -28,18 +28,7 @@ class BaseHandler(metaclass=ABCMeta):
         """
         pass
     
-    # @abstractmethod
-    def get_config(self):
-        pass
-    
-    # @abstractmethod
-    def edit_config(self):
-        pass
-    
-    # @abstractmethod
-    def delete_config(self):
-        pass
-    
     @abstractmethod
-    def validate_config(self):
+    def disconnect(self):
         pass
+    

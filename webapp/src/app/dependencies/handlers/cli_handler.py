@@ -40,14 +40,3 @@ class CliHandler(BaseHandler):
         if self.net_connect:
             self.net_connect.disconnect()
             
-    def get_config(self):
-        pass
-
-    def edit_config(self):
-        pass
-    
-    def delete_config(self):
-        pass
-    
-    def validate_config(self):
-        pass

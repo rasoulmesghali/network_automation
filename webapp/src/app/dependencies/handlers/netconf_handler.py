@@ -49,14 +49,3 @@ class NetconfHandler(BaseHandler):
         # Send the RPC to the Device
         nc_manager.dispatch(xml_.to_ele(save_body))
             
-    def get_config(self):
-        pass
-
-    def edit_config(self):
-        pass
-    
-    def delete_config(self):
-        pass
-    
-    def validate_config(self):
-        pass

@@ -13,8 +13,6 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from config.security import api_key
-from routers.mpls_api.l3vpn import edit_config as l3vpn_edit_config
-from routers.mpls_api.l3vpn import get_config as l3vpn_get_config
 
 from routers.mpls_api.l3vpn import delete_loopback
 from routers.mpls_api.l3vpn import delete_vrf
@@ -23,6 +21,7 @@ from routers.mpls_api.l3vpn import delete_bgp
 from routers.mpls_api.l3vpn import config_loopback 
 from routers.mpls_api.l3vpn import config_mpbgp
 from routers.mpls_api.l3vpn import config_vrf
+from routers.mpls_api.l3vpn import cli_verify_l3vpn
 
 from routers.general_apis import change_dry_run
 
@@ -43,12 +42,12 @@ app.state.logger = logger
 app.test_env = False
 app.state.dry_run = False
 
-app.include_router(l3vpn_get_config.router, dependencies=[Security(get_api_key)])
+# List of APIs
 app.include_router(change_dry_run.router, dependencies=[Security(get_api_key)])
 
-app.include_router(l3vpn_edit_config.router, dependencies=[Security(get_api_key)])
 app.include_router(cli_config_interface.router, dependencies=[Security(get_api_key)])
 app.include_router(cli_verify_underlay_mpls.router, dependencies=[Security(get_api_key)])
+app.include_router(cli_verify_l3vpn.router, dependencies=[Security(get_api_key)])
 
 app.include_router(config_loopback.router, dependencies=[Security(get_api_key)])
 app.include_router(config_mpbgp.router, dependencies=[Security(get_api_key)])
@@ -57,6 +56,7 @@ app.include_router(config_vrf.router, dependencies=[Security(get_api_key)])
 app.include_router(delete_loopback.router, dependencies=[Security(get_api_key)])
 app.include_router(delete_vrf.router, dependencies=[Security(get_api_key)])
 app.include_router(delete_bgp.router, dependencies=[Security(get_api_key)])
+
 @app.on_event("startup")
 async def startup_db_client() -> None:
     app.mongodb_client = motor.motor_asyncio.AsyncIOMotorClient(get_settings().monogodb_url)
