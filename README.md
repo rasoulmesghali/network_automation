@@ -1,7 +1,7 @@
 # Network Automation
 ## Overview
 
-This repository contains the python codes for network configuration automation or mpls l3vpn using netconf and netmiko.
+This repository contains the python codes for network configuration automation for simple mpls l3vpn using netconf and netmiko.
 FastAPI is the web framework is used to handle all APIs.
 
 ```
