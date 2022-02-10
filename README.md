@@ -46,7 +46,7 @@ local setup:
 10- test APIs using postman collections and see the results
 ```
 
-### How to monogodb
+### How to connect monogodb
 
 You need to setup db and with connection credentials and put inside the environment variable then connect to the db.
 There are a variety of options, I uses robo3t, https://robomongo.org/download
