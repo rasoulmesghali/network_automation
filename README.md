@@ -2,6 +2,13 @@
 ## Overview
 
 This repository contains the python codes for network configuration automation or mpls l3vpn using netconf and netmiko.
+FastAPI is the web framework is used to handle all APIs.
+
+```
+1- Some parts of APIs are implemented to work with Netconf/YANG to configure interface, vrf and mpbgp
+2- Some parts of APIS are implemented to deal wit CLI and we have taken benefit from netmiko library and verifications
+3- Requred postman collections added to work with API
+```
 
 ### Prerequirements
 ```
@@ -15,7 +22,7 @@ This repository contains the python codes for network configuration automation o
 docker-compose setup:
 
 ```
-1- Have 2 CSR1000v virtual machine or real device with IOSXE17 or higher version
+1- Have 2 CSR1000v virtual machines or real devices with IOSXE17 or higher version
 2- docker-compose build
 3- docker-compose up
 ```
