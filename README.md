@@ -48,5 +48,5 @@ local setup:
 
 ### How to connect monogodb
 
-You need to setup db and with connection credentials and put inside the environment variable then connect to the db.
+You need to setup db and assign credentials and put them inside the environment variables or ".env" file then connect mongodb.
 There are a variety of options, I uses robo3t, https://robomongo.org/download
