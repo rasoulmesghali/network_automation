@@ -26,7 +26,7 @@ docker-compose setup:
 2- docker-compose build
 3- docker-compose up
 4- Import postman collection from "postman_collections" directory
-5- Turn on routers and setup ip, username, ssh, netconf, yang on the router
+5- Turn on routers and setup ip, username, ssh, netconf, yang
 6- Use correct ip, username, password and device_type in order to connect the routers
 7- test APIs using postman collections and see the results
 ```
