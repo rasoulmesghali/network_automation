@@ -6,7 +6,7 @@ FastAPI is the web framework is used to handle all APIs.
 
 ```
 1- Some parts of APIs are implemented to work with Netconf/YANG to configure interface, vrf and mpbgp
-2- Some parts of APIS are implemented to deal wit CLI and we have taken benefit from netmiko library and verifications
+2- Some parts of APIS are implemented to deal wit CLI and we have taken benefit from netmiko library for configuration and verifications
 3- Requred postman collections added to work with API
 ```
 
