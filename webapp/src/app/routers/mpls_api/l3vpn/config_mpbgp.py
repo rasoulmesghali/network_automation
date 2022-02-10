@@ -21,7 +21,6 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
-from config.fastapi_app import fastapi_app as app
 from config import env
 
 @lru_cache()
@@ -90,7 +89,7 @@ async def mpbgp_config(request:config_data, app_req:Request):
     template = env.get_template(template)
     mpbgp_payload = template.render(data=mpbgp_data)
     
-    if app.state.dry_run:
+    if app_req.app.state.dry_run:
         response_message = "dry_run feature is enabled"
         response_data = mpbgp_payload
     else:

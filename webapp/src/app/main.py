@@ -31,7 +31,6 @@ from routers.mpls_api.underlay import cli_verify_underlay_mpls
 
 from config.security import get_api_key
 from config.log import logger
-from config.fastapi_app import fastapi_app
 from config import env
 
 @lru_cache()
@@ -39,9 +38,10 @@ def get_settings():
     return env.Settings()
 
 # Fastapi App
-app = fastapi_app
+app = app = FastAPI()
 app.state.logger = logger
 app.test_env = False
+app.state.dry_run = False
 
 app.include_router(l3vpn_get_config.router, dependencies=[Security(get_api_key)])
 app.include_router(change_dry_run.router, dependencies=[Security(get_api_key)])

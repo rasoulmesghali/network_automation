@@ -22,7 +22,6 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
-from config.fastapi_app import fastapi_app as app
 from config import env
 
 @lru_cache()
@@ -80,7 +79,7 @@ async def vrf_delete(request:config_data, app_req:Request):
     template = env.get_template(template)
     vrf_payload = template.render(data=vrf_data)
 
-    if app.state.dry_run:
+    if app_req.app.state.dry_run:
         response_message = "dry_run feature is enabled"
         response_data = vrf_payload
     else:

@@ -21,7 +21,6 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.cli_handler import CliHandler
-from config.fastapi_app import fastapi_app as app
 from config import env
 
 @lru_cache()
@@ -78,7 +77,7 @@ async def edit_config(request:interface_request_data, app_req:Request):
                                             .ospf_config(req.get('ospf_pid'), req.get('ospf_area_id'))
     commands = interface_cfg.build()
     
-    if app.state.dry_run:
+    if app_req.app.state.dry_run:
         response_message = "dry_run feature is enabled"
         response_data = commands
     else:

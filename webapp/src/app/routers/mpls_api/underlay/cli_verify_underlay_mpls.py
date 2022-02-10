@@ -16,7 +16,6 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.cli_handler import CliHandler
-from config.fastapi_app import fastapi_app as app
 
 ###########
 # Logging #

@@ -22,8 +22,6 @@ from fastapi.encoders import jsonable_encoder
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
 
-from config.fastapi_app import fastapi_app as app
-
 ###########
 # Logging #
 ###########
@@ -38,7 +36,7 @@ class config_data(BaseModel):
 
 
 @router.patch("/feature/dryrun/", tags=["dryrun activate/deactivate"])
-async def dryrun_config(request:config_data):
+async def dryrun_config(request:config_data, app_req:Request):
     
     """
     Receives request data in json format and configures mpls l3vpn
@@ -46,9 +44,12 @@ async def dryrun_config(request:config_data):
 
     req = request.dict()
     dry_run = req.get('dry_run')
-    app.state.dry_run = dry_run
-    
-    logger.info("\n [+] Dry_run changed to {dry_run}") 
+    if dry_run:
+        app_req.app.state.dry_run = True
+    else:
+        app_req.app.state.dry_run = False
+        
+    logger.info(f"\n [+] Dry_run changed to {dry_run}") 
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,
