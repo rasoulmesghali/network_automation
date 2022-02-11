@@ -23,7 +23,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
-from dependencies.helper.Route_Target_distinguisher_validator import validate_rt_rd
+from dependencies.helper.route_target_distinguisher_validator import validate_rt_rd
 
 from config import env
 
@@ -110,9 +110,7 @@ async def vrf_config(request:config_data, app_req:Request):
                 "data": "wrong vrf_import_rt"
             }),
             )
-    print("*******************************************8")
-    print(vrf_data)
-    print("*******************************************8")
+
     if app_req.app.test_env:
         BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
         module_path = os.path.join(BASE_DIR)
