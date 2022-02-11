@@ -79,18 +79,18 @@ async def mpbgp_config(request:config_data, app_req:Request):
     # Fields validation
     ############################
     
-    try:
-        ipaddress.ip_address(mpbgp_data.get('bgp_router_id'))
-        ipaddress.ip_address(mpbgp_data.get('bgp_neighbor_addr'))
-    except:
-        return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=jsonable_encoder({
-                "status": "failure",
-                "message":"operation failure",
-                "data": "wrong IP Address"
-            }),
-            )
+    # try:
+    #     ipaddress.ip_address(mpbgp_data.get('bgp_router_id'))
+    #     ipaddress.ip_address(mpbgp_data.get('bgp_neighbor_addr'))
+    # except:
+    #     return JSONResponse(
+    #         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+    #         content=jsonable_encoder({
+    #             "status": "failure",
+    #             "message":"operation failure",
+    #             "data": "wrong IP Address"
+    #         }),
+    #         )
         
     if app_req.app.test_env:
         BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
