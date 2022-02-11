@@ -53,29 +53,29 @@ There are a variety of options, I uses robo3t, https://robomongo.org/download
 
 ### API Explanations
  
-"/interface/edit-config/":
+**"/interface/edit-config/":**
 This API is used to configure an interface of the router using Netmiko which is CLI based
 
-"/mpls/underlay/get-config/"
+**"/mpls/underlay/get-config/":**
 This API is used for MPLS underly verification using Netmiko which is CLI based
 
-"/mpls/l3vpn/ping_vrf/"
+**"/mpls/l3vpn/ping_vrf/":**
 This API is used for MPLS L3VPN verification using Netmiko which is CLI based
 
-"/mpls/l3vpn/vrf-delete/"
+**"/mpls/l3vpn/vrf-delete/":**
 This API is used for removing a specific VRF using NETCONG/YANG
 
-"/mpls/l3vpn/vrf-config/"
+**"/mpls/l3vpn/vrf-config/":**
 This API is used for configuring a specific VRF using NETCONG/YANG
 
-"/mpls/l3vpn/mpbgp-delete/"
+**"/mpls/l3vpn/mpbgp-delete/":**
 This API is used for removing BGP configuration using NETCONG/YANG
 
-"/mpls/l3vpn/mpbgp-config/"
+**"/mpls/l3vpn/mpbgp-config/":**
 This API is used for configuring MPBGP using NETCONG/YANG
 
-"/mpls/l3vpn/loopback-config/"
+**"/mpls/l3vpn/loopback-config/":**
 This API is used for configuring a specific loopback interface using NETCONG/YANG
 
-"/mpls/l3vpn/loopback-delete/"
+**"/mpls/l3vpn/loopback-delete/":**
 This API is used for removing a specific loopback interface using NETCONG/YANG
