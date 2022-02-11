@@ -24,3 +24,4 @@ netmiko==3.4.0
 Jinja2==3.0.3
 pytest==7.0.0
 requests==2.27.1
+ipaddress==1.0.23

@@ -9,6 +9,7 @@ from loguru import logger
 from typing import List
 from time import time
 from functools import lru_cache
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
@@ -22,6 +23,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 from config import env
 
 @lru_cache()
@@ -117,7 +119,7 @@ async def loopback_delete(request:config_data, app_req:Request):
             content=jsonable_encoder({
                 "status": "failure",
                 "message":"The operation failed",
-                "data": f"Loopback {loopback_number} does not exist"
+                "data": [f"1-Loopback {loopback_number} does not exist","2-Check BGP update source"]
             }),
             )
 

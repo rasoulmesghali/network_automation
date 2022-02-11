@@ -7,11 +7,12 @@ import sys
 from bcrypt import re
 from loguru import logger
 from functools import lru_cache
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
 from pydantic import BaseModel
-from dependencies.cli_utils.ospf import OSPF
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 from dependencies.cli_utils.interface import Interface  
 
 # Fastapi General
@@ -50,14 +51,14 @@ class connectionData(BaseModel):
 class interface_request_data(BaseModel):
     connection_data: connectionData
     type: str = None
-    number: str = None
+    number: int = None
     ip: Optional[str] = None
     mask: Optional[str] = None
-    enable: Optional[str] = None
-    mpls: Optional[str] = None
-    ospf: Optional[str] = None
-    ospf_pid: Optional[str] = None
-    ospf_area_id: Optional[str] = None
+    enable: Optional[bool] = None
+    mpls: Optional[bool] = None
+    ospf: Optional[bool] = None
+    ospf_pid: Optional[int] = None
+    ospf_area_id: Optional[int] = None
     
     
 @router.post("/interface/edit-config/", tags=["cli interface config"])
@@ -69,6 +70,40 @@ async def edit_config(request:interface_request_data, app_req:Request):
     """
     req = request.dict()
     
+    ############################
+    # Fields validation
+    ############################
+    if req.get('type') not in ["loo", 'loopback', 'gig', 'gigabitethernet']:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong interface type"
+            }),
+            )
+    try:
+        ipaddress.ip_address(req.get('ip'))
+    except:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong IP Address"
+            }),
+            )
+    
+    if not validate_subnetmaskv4(req.get('mask')):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong subnet mask"
+            }),
+            )
+        
     interface = Interface(req.get('type'), req.get('number'))
     interface_cfg = interface.definition()\
                                 .enable()\

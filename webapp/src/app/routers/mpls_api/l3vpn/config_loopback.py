@@ -9,6 +9,7 @@ from loguru import logger
 from typing import List
 from time import time
 from functools import lru_cache
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
@@ -22,6 +23,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 from config import env
 
 @lru_cache()
@@ -68,6 +70,28 @@ async def loopback_config(request:config_data, app_req:Request):
     loopback_data = req.get('loopback_data')
     loopback_number = loopback_data.get('loopback_number')
 
+    try:
+        ipaddress.ip_address(loopback_data.get('ipv4'))
+    except:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong IP Address"
+            }),
+            )
+    
+    if not validate_subnetmaskv4(loopback_data.get('ipv4_mask')):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong subnet mask"
+            }),
+            )
+        
     template = "loopback_interface.xml"
 
     if app_req.app.test_env:

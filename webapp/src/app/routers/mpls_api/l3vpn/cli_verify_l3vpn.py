@@ -4,6 +4,7 @@ import os
 import sys
 from bcrypt import re
 from loguru import logger
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
@@ -16,6 +17,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.cli_handler import CliHandler
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 
 ###########
 # Logging #

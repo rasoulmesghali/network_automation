@@ -8,6 +8,7 @@ from bcrypt import re
 from loguru import logger
 from typing import List
 from functools import lru_cache
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
@@ -21,6 +22,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 from config import env
 
 @lru_cache()
@@ -73,6 +75,19 @@ async def mpbgp_config(request:config_data, app_req:Request):
     connection_data = req.get('connection_data')
     mpbgp_data = req.get('mpbgp_data')
     
+    try:
+        ipaddress.ip_address(mpbgp_data.get('bgp_router_id'))
+        ipaddress.ip_address(mpbgp_data.get('bgp_neighbor_addr'))
+    except:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong IP Address"
+            }),
+            )
+        
     if app_req.app.test_env:
         BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
         module_path = os.path.join(BASE_DIR)

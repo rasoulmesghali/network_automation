@@ -9,6 +9,7 @@ from loguru import logger
 from typing import List
 from time import time
 from functools import lru_cache
+import ipaddress
 
 # Pydantic schema validation
 from typing import Optional
@@ -22,6 +23,7 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
+from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
 from config import env
 
 @lru_cache()
