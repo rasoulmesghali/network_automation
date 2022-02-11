@@ -75,6 +75,10 @@ async def mpbgp_config(request:config_data, app_req:Request):
     connection_data = req.get('connection_data')
     mpbgp_data = req.get('mpbgp_data')
     
+    ###########################
+    # Fields validation
+    ############################
+    
     try:
         ipaddress.ip_address(mpbgp_data.get('bgp_router_id'))
         ipaddress.ip_address(mpbgp_data.get('bgp_neighbor_addr'))

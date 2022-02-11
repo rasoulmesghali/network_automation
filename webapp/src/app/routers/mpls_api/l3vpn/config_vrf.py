@@ -23,7 +23,8 @@ from fastapi.encoders import jsonable_encoder
 
 # Internal modules
 from dependencies.handlers.netconf_handler import NetconfHandler
-from dependencies.helper.subnetmask_validator import validate_subnetmaskv4
+from dependencies.helper.Route_Target_distinguisher_validator import validate_rt_rd
+
 from config import env
 
 @lru_cache()
@@ -47,14 +48,14 @@ class connectionData(BaseModel):
     device_type: str
     
 class VRFdata(BaseModel):
-    vrf_name: Optional[str]
+    vrf_name: str
     vrf_rd: Optional[str]
     vrf_export_rt: Optional[str]
     vrf_import_rt: Optional[str]
 
 class config_data(BaseModel):
     connection_data: connectionData
-    vrf_data: Optional[VRFdata]
+    vrf_data: VRFdata
 
 
 @router.post("/mpls/l3vpn/vrf-config/", tags=["vrf config"])
@@ -68,6 +69,50 @@ async def vrf_config(request:config_data, app_req:Request):
     connection_data = req.get('connection_data')
     vrf_data = req.get('vrf_data')
 
+    ###########################
+    # Fields validation
+    ############################
+    if vrf_data.get("vrf_rd") == None:
+        del vrf_data["vrf_rd"]
+    elif vrf_data.get("vrf_rd") != None and not validate_rt_rd(vrf_data.get("vrf_rd")):
+                    
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong vrf_rd"
+            }),
+            )
+
+    if vrf_data.get("vrf_export_rt") == None:
+        del vrf_data["vrf_export_rt"]
+    elif vrf_data.get("vrf_export_rt") != None and not validate_rt_rd(vrf_data.get("vrf_export_rt")):
+                    
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong vrf_export_rt"
+            }),
+            )
+        
+    if vrf_data.get("vrf_import_rt") == None:
+        del vrf_data["vrf_import_rt"]
+    elif vrf_data.get("vrf_import_rt") != None and not validate_rt_rd(vrf_data.get("vrf_import_rt")):
+                    
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "status": "failure",
+                "message":"operation failure",
+                "data": "wrong vrf_import_rt"
+            }),
+            )
+    print("*******************************************8")
+    print(vrf_data)
+    print("*******************************************8")
     if app_req.app.test_env:
         BASE_DIR = os.path.abspath(os.path.join(__file__ ,"../../../../../../"))
         module_path = os.path.join(BASE_DIR)

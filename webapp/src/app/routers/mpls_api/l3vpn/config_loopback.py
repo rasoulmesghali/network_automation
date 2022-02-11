@@ -70,6 +70,10 @@ async def loopback_config(request:config_data, app_req:Request):
     loopback_data = req.get('loopback_data')
     loopback_number = loopback_data.get('loopback_number')
 
+    ###########################
+    # Fields validation
+    ############################
+    
     try:
         ipaddress.ip_address(loopback_data.get('ipv4'))
     except:
